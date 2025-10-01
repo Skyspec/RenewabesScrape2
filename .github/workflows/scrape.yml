@@ -34,9 +34,13 @@ jobs:
       #     pip install playwright
       #     playwright install --with-deps
 
-      - name: Run scraper (NSW + QLD first)
-        run: |
-          python run.py --states NSW QLD --sources nsw_major_projects qld_qtenders --query "solar OR wind OR energy" --limit 100
+      - name: Run scraper (Discovery sources)
+  run: |
+    python run.py \
+      --states NSW QLD VIC ACT TAS \
+      --sources rss_feeds icn_gateway nsw_major_projects \
+      --query "solar OR wind OR battery OR energy" \
+      --limit 120
 
       - name: Upload CSV + DB
         uses: actions/upload-artifact@v4
