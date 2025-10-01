@@ -1,0 +1,6 @@
+Add to scraper/sources/__init__.py:
+
+from .icn_gateway import ICNGateway
+from .rss_feeds import RSSFeeds
+
+AVAILABLE_SOURCES.update({'icn_gateway': ICNGateway, 'rss_feeds': RSSFeeds})

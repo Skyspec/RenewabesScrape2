@@ -1,0 +1,18 @@
+- name: RenewEconomy
+  url: https://reneweconomy.com.au/feed/
+  keywords: ["solar","wind","battery","tender","EPC","commissioning","financial close","NTP"]
+- name: PV Magazine Australia
+  url: https://www.pv-magazine-australia.com/feed/
+  keywords: ["solar","tender","EPC","commissioning","MW","MWh"]
+- name: Energy Magazine
+  url: https://www.energymagazine.com.au/feed/
+  keywords: ["solar","wind","battery","EPC","EOI","tender","contract awarded"]
+- name: AGL Newsroom
+  url: https://www.agl.com.au/about-agl/media-centre/_rss/newsroom
+  keywords: ["renewable","solar","wind","battery","construction","EPC","commissioning"]
+- name: Origin Energy News
+  url: https://www.originenergy.com.au/blog/feed/
+  keywords: ["renewable","solar","wind","battery","construction","tender","commissioning"]
+- name: ACEN Australia News
+  url: https://au.acenrenewables.com/feed/
+  keywords: ["solar","wind","battery","construction","EPC","commissioning","financial close"]
