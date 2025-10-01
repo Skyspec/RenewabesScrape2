@@ -1,9 +1,10 @@
 name: Scrape Energy Projects (AU East)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
   schedule:
-    - cron: "0 14 * * *"   # ~1:00am Sydney during AEDT
+    # Daily at 14:00 UTC (~1:00am Sydney during AEDT)
+    - cron: "0 14 * * *"
 
 permissions:
   contents: read
@@ -13,9 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONUNBUFFERED: "1"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Show repo tree (debug)
+        run: |
+          echo "PWD: $(pwd)"
+          ls -la
+          echo "----- TREE (3 levels) -----"
+          if command -v tree >/dev/null 2>&1; then
+            tree -L 3
+          else
+            sudo apt-get update && sudo apt-get install -y tree
+            tree -L 3
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,26 +37,31 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install dependencies (if requirements.txt exists)
+        if: hashFiles('requirements.txt') != ''
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # If you add JS-driven scrapers later:
-      # - name: Install Playwright browsers
-      #   run: |
-      #     pip install playwright
-      #     playwright install --with-deps
+      # ---- Run the scraper ----
+      # Requires these at repo root:
+      #   run.py
+      #   scraper/ (with sources/__init__.py registering rss_feeds, icn_gateway, nsw_major_projects)
+      #   data/feeds.yaml  (for RSS sources)
+      - name: Run scraper
+        run: |
+          if [ ! -f "run.py" ]; then
+            echo "run.py not found at repo root. Check your upload/paths." >&2
+            exit 1
+          fi
+          python run.py \
+            --states NSW QLD VIC ACT TAS \
+            --sources rss_feeds icn_gateway nsw_major_projects \
+            --query "solar OR wind OR battery OR energy" \
+            --limit 120
 
-      - name: Run scraper (Discovery sources)
-  run: |
-    python run.py \
-      --states NSW QLD VIC ACT TAS \
-      --sources rss_feeds icn_gateway nsw_major_projects \
-      --query "solar OR wind OR battery OR energy" \
-      --limit 120
-
-      - name: Upload CSV + DB
+      - name: Upload CSV + DB (best-effort)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: projects_snapshot-${{ github.run_id }}
@@ -50,4 +69,3 @@ jobs:
             data/projects_snapshot.csv
             data/projects.sqlite
           if-no-files-found: warn
-
